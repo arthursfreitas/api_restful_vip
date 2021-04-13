@@ -1,36 +1,30 @@
 {
   "name": "boilerplate-api-express",
-  "version": "0.0.1",
-  "description": "Boilerplate API Express.",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:arthursfreitas/boilerplate_express_api.git",
+  "author": "Arthur Freitas <arthurssfreitas@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "npx nodemon --exec ts-node --files src/index.ts",
+    "typeorm": "npx ts-node ./node_modules/typeorm/cli.js"
+  },
   "devDependencies": {
-    "@types/cors": "^2.8.10",
+    "@types/bcryptjs": "^2.4.2",
     "@types/express": "^4.17.11",
-    "@types/node": "^8.0.29",
-    "@typescript-eslint/eslint-plugin": "^4.21.0",
-    "@typescript-eslint/parser": "^4.21.0",
-    "eslint-config-airbnb-base": "^14.2.1",
+    "@types/jsonwebtoken": "^8.5.1",
     "nodemon": "^2.0.7",
-    "prettier": "^2.2.1",
-    "ts-node": "3.3.0",
-    "typescript": "3.3.3333"
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.4"
   },
   "dependencies": {
-    "@types/morgan": "^1.9.2",
+    "bcryptjs": "^2.4.3",
     "class-validator": "^0.13.1",
-    "cors": "^2.8.5",
     "dotenv": "^8.2.0",
-    "eslint": "^7.23.0",
     "express": "^4.17.1",
-    "morgan": "^1.10.0",
-    "mysql": "^2.14.1",
-    "reflect-metadata": "^0.1.10",
-    "typeorm": "0.2.32",
-    "uuidv4": "^6.2.7"
-  },
-  "scripts": {
-    "build": "tsc",
-    "start": "node src/server.ts",
-    "dev": "nodemon src/server.ts",
-    "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js"
+    "jsonwebtoken": "^8.5.1",
+    "mysql": "^2.18.1",
+    "reflect-metadata": "^0.1.13",
+    "typeorm": "^0.2.32"
   }
 }

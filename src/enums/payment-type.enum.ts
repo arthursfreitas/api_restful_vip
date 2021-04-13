@@ -1,5 +1,0 @@
-export enum PAYMENT_TYPE {
-  DINHEIRO = 'DINHEIRO',
-  CARTAO = 'CARTÃO',
-  CHEQUE = 'CHEQUE',
-}
