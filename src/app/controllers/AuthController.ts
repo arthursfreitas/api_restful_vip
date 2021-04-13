@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { getRepository } from 'typeorm'
 import bcrypt from 'bcryptjs'
 import jwt, { Secret } from 'jsonwebtoken'
-import User from '../models/User'
+import User from '../models/Client'
 
 interface IUser {
   id: string
