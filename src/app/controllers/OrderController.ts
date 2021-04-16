@@ -106,10 +106,8 @@ class OrderController {
     const totalOrder = await totalPerProduct.reduce((acc: any, total: any) => {
       return acc + total
     })
-
     return {
       data,
-      totalPerProduct,
       totalOrder,
     }
   }
@@ -128,6 +126,7 @@ class OrderController {
             payment_type: res.payment_type,
           }
         })[0]
+      console.log(order)
       const formattedDate = uniqueItems.created_at.toLocaleDateString('pt-BR')
 
       const emailSent = await dataSendMail(
@@ -147,13 +146,18 @@ class OrderController {
               </ul>
             </div>
             <div>
-              <h1>Dados do produto:</h1>
+              <h2>Produtos:</h2>
               <ul>
               ${order.data.map((product: any) => {
+                const totalProduct =
+                  parseFloat(product.price) * product.quantity
+
                 return `<li>
                 <span>Produto: </span>${product.name}</li>
                 <li><span>Preço: </span>R$${product.price}</li>
-                <li><span>Quantidade: </span>${product.quantity}</li>`
+                <li><span>Quantidade: </span>${product.quantity}</li>
+                <li><span>SubTotal: </span>${totalProduct}</li>
+                `
               })}
               </ul>
             </div>
