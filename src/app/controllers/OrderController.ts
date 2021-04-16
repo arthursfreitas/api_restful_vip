@@ -1,7 +1,8 @@
 import { validate } from 'class-validator'
 import { Request, Response } from 'express'
-import { getRepository, Like } from 'typeorm'
+import { getRepository } from 'typeorm'
 import PaymentType from '../enums/PaymentType'
+import { dataSendMail } from '../helpers/mail'
 import Order from '../models/Order'
 import OrderItem from '../models/OrderItem'
 import Product from '../models/Product'
@@ -106,16 +107,70 @@ class OrderController {
       return acc + total
     })
 
-    return { data, totalPerProduct, totalOrder }
+    return {
+      data,
+      totalPerProduct,
+      totalOrder,
+    }
   }
 
   async sendMail(req: Request, res: Response) {
     try {
       const { order_code } = req.params
       const order = await OrderController.getOrderDetails(order_code)
-      return res.json(order)
+
+      const uniqueItems = order.data
+        .filter((orders: any) => orders)
+        .map((res: any) => {
+          return {
+            email: res.email,
+            created_at: res.created_at,
+            payment_type: res.payment_type,
+          }
+        })[0]
+      const formattedDate = uniqueItems.created_at.toLocaleDateString('pt-BR')
+
+      const emailSent = await dataSendMail(
+        ['contato@arthursfreitas.com.br'],
+        `Pedido - ${order_code}`,
+        '',
+        `<html>
+          <body>
+            <div>
+            <h1>Dados do pedido:</h1>
+              <ul>
+              <li><span>Email: </span>${uniqueItems.email}</li>
+              <li><span>Data do pedido: </span>${formattedDate}</li>
+              <li><span>Forma de pagamento: </span>${
+                uniqueItems.payment_type
+              }</li>
+              </ul>
+            </div>
+            <div>
+              <h1>Dados do produto:</h1>
+              <ul>
+              ${order.data.map((product: any) => {
+                return `<li>
+                <span>Produto: </span>${product.name}</li>
+                <li><span>Preço: </span>R$${product.price}</li>
+                <li><span>Quantidade: </span>${product.quantity}</li>`
+              })}
+              </ul>
+            </div>
+            <div>
+              <ul>
+              <li><strong>Total: </strong>R$${order.totalOrder}</li>
+              </ul>
+            </div>
+          </body>
+        </html>`
+      )
+      return res
+        .status(200)
+        .json({ message: `Email enviado para: ${emailSent.envelope.to}` })
     } catch (error) {
       console.log(error.message)
+      return res.json({ message: `Erro ao enviar email!` })
     }
   }
 }
