@@ -1,6 +1,6 @@
 import { validate } from 'class-validator'
 import { Request, Response } from 'express'
-import { getRepository } from 'typeorm'
+import { getRepository, Like } from 'typeorm'
 import PaymentType from '../enums/PaymentType'
 import Order from '../models/Order'
 import OrderItem from '../models/OrderItem'
@@ -42,7 +42,7 @@ class OrderController {
           .findOne(product.product_code)
           .then(prod => {
             if (!prod) {
-              return res.status(400).json({ error: `Produto não cadastrado!` })
+              return res.status(404).json({ error: `Produto não cadastrado!` })
             }
           })
       })
@@ -82,6 +82,40 @@ class OrderController {
     } catch (error) {
       console.log(`Error message: ${error.message}`)
       return res.json({ error: 'Erro ao criar pedido!' })
+    }
+  }
+
+  private static async getOrderDetails(order_code: string) {
+    const orderItemRepository = getRepository(OrderItem)
+
+    const data = await orderItemRepository.query(`
+    SELECT clients.name, clients.email, products.name, products.price, order_item.quantity,
+    orders.payment_type, orders.created_at
+    FROM order_item
+    INNER JOIN orders ON orders.order_code = '${order_code}'  
+    INNER JOIN clients ON clients.client_code = orders.clientClientCode
+    INNER JOIN products ON products.product_code = order_item.product_code
+    WHERE order_item.order_code = '${order_code}'`)
+
+    const totalPerProduct = await data.map((product: any) => {
+      const totalProduct = parseFloat(product.price) * product.quantity
+      return totalProduct
+    })
+
+    const totalOrder = await totalPerProduct.reduce((acc: any, total: any) => {
+      return acc + total
+    })
+
+    return { data, totalPerProduct, totalOrder }
+  }
+
+  async sendMail(req: Request, res: Response) {
+    try {
+      const { order_code } = req.params
+      const order = await OrderController.getOrderDetails(order_code)
+      return res.json(order)
+    } catch (error) {
+      console.log(error.message)
     }
   }
 }

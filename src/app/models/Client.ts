@@ -3,12 +3,9 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
-import Order from './Order'
-import OrderItem from './OrderItem'
 
 @Entity('clients')
 class Client {
