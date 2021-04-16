@@ -23,12 +23,14 @@ export class CreateOrderTable1618336869929 implements MigrationInterface {
             default: '"money"',
           },
           {
-            name: 'created_at',
+            name: 'created_At',
             type: 'timestamp',
+            default: 'now()',
           },
           {
-            name: 'updated_at',
+            name: 'updated_At',
             type: 'timestamp',
+            default: 'now()',
           },
         ],
       })

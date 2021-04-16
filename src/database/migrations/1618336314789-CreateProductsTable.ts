@@ -29,12 +29,14 @@ export class CreateProductsTable1618336314789 implements MigrationInterface {
             type: 'varchar',
           },
           {
-            name: 'created_at',
+            name: 'created_At',
             type: 'timestamp',
+            default: 'now()',
           },
           {
-            name: 'updated_at',
+            name: 'updated_At',
             type: 'timestamp',
+            default: 'now()',
           },
         ],
       })

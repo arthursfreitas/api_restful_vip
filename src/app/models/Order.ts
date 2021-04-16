@@ -2,10 +2,17 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
 import PaymentType from '../enums/PaymentType'
+import Client from './Client'
+import OrderItem from './OrderItem'
+import Product from './Product'
 
 @Entity('orders')
 class Order {
@@ -23,5 +30,11 @@ class Order {
 
   @UpdateDateColumn()
   updated_at: Date
+
+  @ManyToOne(() => Client)
+  client: Client
+
+  @OneToMany(() => OrderItem, order_item => order_item.order, { cascade: true })
+  order_item: OrderItem[]
 }
 export default Order

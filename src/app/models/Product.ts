@@ -3,9 +3,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
+import OrderItem from './OrderItem'
 
 @Entity('products')
 class Product {
@@ -31,10 +34,18 @@ class Product {
   @IsString()
   price: string
 
+  @Column()
+  quantity: number
+
   @CreateDateColumn()
   created_at: Date
 
   @UpdateDateColumn()
   updated_at: Date
+
+  @OneToMany(() => OrderItem, order_item => order_item.product, {
+    cascade: true,
+  })
+  order_item: OrderItem
 }
 export default Product

@@ -3,12 +3,15 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
+import Order from './Order'
+import OrderItem from './OrderItem'
 
 @Entity('clients')
-class User {
+class Client {
   @PrimaryGeneratedColumn('uuid')
   client_code: string
 
@@ -21,16 +24,16 @@ class User {
   cpf: string
 
   @Column()
-  sexo: string
+  gender: string
 
   @Column()
   @IsEmail()
   email: string
 
-  @CreateDateColumn()
-  created_at: Date
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date
 
-  @UpdateDateColumn()
-  updated_at: Date
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date
 }
-export default User
+export default Client

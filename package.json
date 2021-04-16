@@ -1,8 +1,8 @@
 {
-  "name": "boilerplate-api-express",
+  "name": "api_restful_vip",
   "version": "1.0.0",
   "main": "index.js",
-  "repository": "git@github.com:arthursfreitas/boilerplate_express_api.git",
+  "repository": "git@github.com:arthursfreitas/api_restful_vip.git",
   "author": "Arthur Freitas <arthurssfreitas@gmail.com>",
   "license": "MIT",
   "scripts": {

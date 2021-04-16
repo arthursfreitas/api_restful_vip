@@ -22,7 +22,7 @@ export class CreateClientsTable1618336178349 implements MigrationInterface {
             isUnique: true,
           },
           {
-            name: 'sexo',
+            name: 'gender',
             type: 'varchar',
           },
           {
@@ -31,12 +31,14 @@ export class CreateClientsTable1618336178349 implements MigrationInterface {
             isUnique: true,
           },
           {
-            name: 'created_at',
+            name: 'created_At',
             type: 'timestamp',
+            default: 'now()',
           },
           {
-            name: 'updated_at',
+            name: 'updated_At',
             type: 'timestamp',
+            default: 'now()',
           },
         ],
       })
