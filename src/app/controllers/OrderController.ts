@@ -1,11 +1,14 @@
 import { validate } from 'class-validator'
 import { Request, Response } from 'express'
+import pdf from 'html-pdf'
 import { getRepository } from 'typeorm'
 import PaymentType from '../enums/PaymentType'
 import { dataSendMail } from '../helpers/mail'
 import Order from '../models/Order'
 import OrderItem from '../models/OrderItem'
 import Product from '../models/Product'
+import path from 'path'
+import fs from 'fs'
 
 export interface IOrder {
   note: string
@@ -76,7 +79,7 @@ class OrderController {
         })
       })
 
-      return res.status(200).json({
+      return res.status(201).json({
         order,
         results,
       })
@@ -126,55 +129,201 @@ class OrderController {
             payment_type: res.payment_type,
           }
         })[0]
-      console.log(order)
+
       const formattedDate = uniqueItems.created_at.toLocaleDateString('pt-BR')
 
       const emailSent = await dataSendMail(
-        ['contato@arthursfreitas.com.br'],
+        [uniqueItems.email],
         `Pedido - ${order_code}`,
         '',
         `<html>
-          <body>
-            <div>
-            <h1>Dados do pedido:</h1>
-              <ul>
-              <li><span>Email: </span>${uniqueItems.email}</li>
-              <li><span>Data do pedido: </span>${formattedDate}</li>
-              <li><span>Forma de pagamento: </span>${
-                uniqueItems.payment_type
-              }</li>
-              </ul>
-            </div>
-            <div>
-              <h2>Produtos:</h2>
-              <ul>
-              ${order.data.map((product: any) => {
+      <body>
+      <style>
+      @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+      body{
+        margin:0px;
+        font-family:'Poppins';
+      }
+      span {
+        font-weight: bold;
+      }
+      .wrapper{
+        padding:30px;
+      }
+      ul{
+        list-style:none;
+      }
+      header{
+        width: auto;
+        margin-left: calc(50% - 50vw);
+        align-items: center;
+        justify-content: center;
+        display: flex;
+        margin-right: calc(50% - 50vw);
+        height: 150px;
+        background-color: #0271bc;
+      }
+      header h1{
+        text-transform:uppercase;
+        color:#fff;
+      }
+      </style>
+      
+      <header>
+        <h1>Relatório do pedido</h1>
+      </header>
+      <div class="wrapper">
+          <div>
+          <h1>Dados do pedido:</h1>
+            <ul>
+            <li><span>Email: </span>${uniqueItems.email}</li>
+            <li><span>Data do pedido: </span>${formattedDate}</li>
+            <li><span>Forma de pagamento: </span>${
+              uniqueItems.payment_type
+            }</li>
+            </ul>
+          </div>
+          <div>
+            <h2>Produtos:</h2>
+            <ul>
+            ${order.data
+              .map((product: any) => {
                 const totalProduct =
                   parseFloat(product.price) * product.quantity
 
                 return `<li>
-                <span>Produto: </span>${product.name}</li>
-                <li><span>Preço: </span>R$${product.price}</li>
-                <li><span>Quantidade: </span>${product.quantity}</li>
-                <li><span>SubTotal: </span>${totalProduct}</li>
-                `
-              })}
-              </ul>
-            </div>
-            <div>
-              <ul>
-              <li><strong>Total: </strong>R$${order.totalOrder}</li>
-              </ul>
-            </div>
-          </body>
-        </html>`
+              <span>Nome: </span>${product.name}</li>
+              <li><span>Preço: </span>R$${product.price}</li>
+              <li><span>Quantidade: </span>${product.quantity}</li>
+              <li><span>SubTotal: </span>R$${totalProduct}</li>
+              <hr>
+              `
+              })
+              .join('')}
+            </ul>
+          </div>
+          <div>
+            <ul>
+            <li><strong>Total: </strong>R$${order.totalOrder}</li>
+            </ul>
+          </div>
+        </div>
+      </body>
+    </html>`
       )
+
       return res
         .status(200)
         .json({ message: `Email enviado para: ${emailSent.envelope.to}` })
     } catch (error) {
       console.log(error.message)
       return res.json({ message: `Erro ao enviar email!` })
+    }
+  }
+
+  async exportPdf(req: Request, res: Response) {
+    try {
+      const { order_code } = req.params
+      const order = await OrderController.getOrderDetails(order_code)
+
+      const uniqueItems = order.data
+        .filter((orders: any) => orders)
+        .map((res: any) => {
+          return {
+            email: res.email,
+            created_at: res.created_at,
+            payment_type: res.payment_type,
+          }
+        })[0]
+
+      const formattedDate = uniqueItems.created_at.toLocaleDateString('pt-BR')
+      let pdfContent = `<html>
+      <body>
+      <style>
+      @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+      body{
+        margin:0px;
+        font-family:'Poppins';
+      }
+      span {
+        font-weight: bold;
+      }
+      .wrapper{
+        padding:30px;
+      }
+      ul{
+        list-style:none;
+      }
+      header{
+        width: auto;
+        margin-left: calc(50% - 50vw);
+        align-items: center;
+        justify-content: center;
+        display: flex;
+        margin-right: calc(50% - 50vw);
+        height: 150px;
+        background-color: #0271bc;
+      }
+      header h1{
+        text-transform:uppercase;
+        color:#fff;
+      }
+      </style>
+      
+      <header>
+        <h1>Relatório do pedido</h1>
+      </header>
+      <div class="wrapper">
+          <div>
+          <h1>Dados do pedido:</h1>
+            <ul>
+            <li><span>Email: </span>${uniqueItems.email}</li>
+            <li><span>Data do pedido: </span>${formattedDate}</li>
+            <li><span>Forma de pagamento: </span>${
+              uniqueItems.payment_type
+            }</li>
+            </ul>
+          </div>
+          <div>
+            <h2>Produtos:</h2>
+            <ul>
+            ${order.data
+              .map((product: any) => {
+                const totalProduct =
+                  parseFloat(product.price) * product.quantity
+
+                return `<li>
+              <span>Nome: </span>${product.name}</li>
+              <li><span>Preço: </span>R$${product.price}</li>
+              <li><span>Quantidade: </span>${product.quantity}</li>
+              <li><span>SubTotal: </span>R$${totalProduct}</li>
+              <hr>
+              `
+              })
+              .join('')}
+            </ul>
+          </div>
+          <div>
+            <ul>
+            <li><strong>Total: </strong>R$${order.totalOrder}</li>
+            </ul>
+          </div>
+        </div>
+      </body>
+    </html>`
+
+      pdf
+        .create(pdfContent, {})
+        .toFile(`public/docs/${order_code}.pdf`, (error, response) => {
+          if (error) {
+            console.log(`Erro ao exportar PDF: ${error}`)
+          } else {
+            return res.status(200).download(`public/docs/${order_code}.pdf`)
+          }
+        })
+    } catch (error) {
+      console.log(error.message)
+      return res.json({ message: `Erro ao exportar PDF!` })
     }
   }
 }

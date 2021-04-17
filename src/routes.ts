@@ -17,4 +17,5 @@ router.post('/products', ProductController.store)
 router.get('/orders', OrderController.index)
 router.post('/orders', OrderController.store)
 router.post('/orders/:order_code/sendmail', OrderController.sendMail)
+router.post('/orders/:order_code/report', OrderController.exportPdf)
 export default router

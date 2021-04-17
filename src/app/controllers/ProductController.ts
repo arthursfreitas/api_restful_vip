@@ -25,7 +25,7 @@ class ProductController {
         return res.status(400).json(errors)
       }
       const saveProduct = await repository.save(product)
-      return res.status(200).json(saveProduct)
+      return res.status(201).json(saveProduct)
     } catch (error) {
       console.log(`Error message: ${error.message}`)
       return res.sendStatus(400)
