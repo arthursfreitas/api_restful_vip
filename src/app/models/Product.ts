@@ -1,7 +1,8 @@
-import { IsNotEmpty, IsString } from 'class-validator'
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator'
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   ManyToOne,
   OneToMany,
@@ -47,5 +48,8 @@ class Product {
     cascade: true,
   })
   order_item: OrderItem
+
+  @DeleteDateColumn()
+  deleted_at?: Date
 }
 export default Product

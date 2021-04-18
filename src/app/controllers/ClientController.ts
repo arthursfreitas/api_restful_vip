@@ -101,7 +101,6 @@ class ClientController {
           await clientRepository.remove(client)
         })
       })
-
       return res.sendStatus(200)
     } catch (error) {
       console.log(error.message)

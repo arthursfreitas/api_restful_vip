@@ -66,7 +66,7 @@ class ProductController {
       if (!productExists) {
         return res.status(400).json({ error: `Produto não encontrado!` })
       }
-      await repository.remove(productExists)
+      await repository.softRemove(productExists)
       return res.sendStatus(200)
     } catch (error) {
       console.log(error.message)
