@@ -7,8 +7,6 @@ import { dataSendMail } from '../helpers/mail'
 import Order from '../models/Order'
 import OrderItem from '../models/OrderItem'
 import Product from '../models/Product'
-import path from 'path'
-import fs from 'fs'
 
 export interface IOrder {
   note: string
@@ -33,6 +31,33 @@ class OrderController {
     const orders = await repository.find()
     return res.status(200).json(orders)
   }
+  async show(req: Request, res: Response) {
+    const repository = getRepository(Order)
+    const { order_code } = req.params
+    const order = await repository.findOne({ order_code })
+    if (!order) {
+      return res.status(404).json({ error: `Pedido não encontrado!` })
+    }
+    return res.status(200).json(order)
+  }
+
+  async update(req: Request, res: Response) {
+    const repository = getRepository(Order)
+    const { order_code } = req.params
+    const { note, payment_type } = req.body
+    const orderExists = await repository.findOne({ order_code })
+    if (!orderExists) {
+      return res.status(404).json({ error: `Pedido não encontrado!` })
+    }
+
+    await repository.update(order_code, {
+      note,
+      payment_type,
+    })
+
+    return res.status(200).json({ message: 'Pedido atualizado com sucesso!' })
+  }
+
   async store(req: Request, res: Response) {
     try {
       const orderRepository = getRepository(Order)
@@ -86,6 +111,36 @@ class OrderController {
     } catch (error) {
       console.log(`Error message: ${error.message}`)
       return res.json({ error: 'Erro ao criar pedido!' })
+    }
+  }
+
+  async destroy(req: Request, res: Response) {
+    try {
+      const orderRepository = getRepository(Order)
+      const orderItemRepository = getRepository(OrderItem)
+
+      const { order_code } = req.params
+      const order_item = await orderItemRepository.find({
+        select: ['item_order_code'],
+        where: [{ order_code: order_code }],
+      })
+
+      if (!order_item) {
+        return res
+          .status(404)
+          .json({ error: `Itens do pedido não encontrado!` })
+      }
+
+      await orderItemRepository.remove(order_item)
+      const order = await orderRepository.findOne({ order_code })
+      if (!order) {
+        return res.status(404).json({ error: `Pedido não encontrado!` })
+      }
+      await orderRepository.remove(order)
+      return res.sendStatus(200)
+    } catch (error) {
+      console.log(error.message)
+      return res.json({ message: `Erro ao excluir pedido!` })
     }
   }
 
