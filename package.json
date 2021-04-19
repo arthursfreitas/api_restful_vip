@@ -7,14 +7,18 @@
   "license": "MIT",
   "scripts": {
     "dev": "npx nodemon --exec ts-node --files src/index.ts",
-    "typeorm": "npx ts-node ./node_modules/typeorm/cli.js"
+    "typeorm": "npx ts-node ./node_modules/typeorm/cli.js",
+    "test": "npx jest --no-cache --detectOpenHandles"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
     "@types/express": "^4.17.11",
     "@types/html-pdf": "^2.2.0",
+    "@types/jest": "^26.0.22",
     "@types/jsonwebtoken": "^8.5.1",
     "@types/nodemailer": "^6.4.1",
+    "@types/supertest": "^2.0.11",
+    "jest": "^26.6.3",
     "nodemon": "^2.0.7",
     "ts-node": "^9.1.1",
     "typescript": "^4.2.4"
@@ -29,6 +33,8 @@
     "mysql": "^2.18.1",
     "nodemailer": "^6.5.0",
     "reflect-metadata": "^0.1.13",
+    "supertest": "^6.1.3",
+    "ts-jest": "^26.5.5",
     "typeorm": "^0.2.32"
   }
 }

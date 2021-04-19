@@ -7,7 +7,7 @@ import path from 'path'
 
 dotenv.config()
 
-const app = express()
+export const app = express()
 app.use('/public', express.static(path.resolve('./public')))
 
 app.use(express.json())
